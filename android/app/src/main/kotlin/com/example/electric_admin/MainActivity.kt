@@ -1,4 +1,4 @@
-package com.example.electric_admin
+package com.electric.electric_admin
 
 import io.flutter.embedding.android.FlutterActivity
 
