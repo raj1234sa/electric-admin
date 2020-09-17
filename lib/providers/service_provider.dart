@@ -20,6 +20,7 @@ class ServiceController extends GetxController {
       list.add(Service.fromJson(element.data()));
     });
     services = list;
+    print(services);
     update();
   }
 

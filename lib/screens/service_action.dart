@@ -92,7 +92,7 @@ class _ServiceActionScreenState extends State<ServiceActionScreen> {
         _loading = true;
       });
       FocusScope.of(context).unfocus();
-      final ServiceController serviceController = Get.put(ServiceController());
+      final ServiceController serviceController = Get.find(tag: 'serviceController');
       Service service = Service(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         name: _nameController.text,
