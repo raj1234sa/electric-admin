@@ -1,21 +1,14 @@
+import 'package:electric_admin/models/service.dart';
+import 'package:electric_admin/providers/service_provider.dart';
 import 'package:electric_admin/screens/service_action.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import '../models/service.dart';
-import '../providers/service_provider.dart';
-import '../providers/service_provider.dart';
-import '../providers/service_provider.dart';
-import '../providers/service_provider.dart';
 
 class ServicesListScreen extends StatelessWidget {
   static const ROUTE_NAME = 'ServicesListScreen';
 
   @override
   Widget build(BuildContext context) {
-    final ServiceController serviceController =
-        Get.put(ServiceController(), tag: 'serviceController');
-    final List<Service> services = serviceController.list;
     return Scaffold(
       appBar: AppBar(
         title: Text('Services List'),
@@ -30,9 +23,9 @@ class ServicesListScreen extends StatelessWidget {
       body: Container(
         child: GetBuilder<ServiceController>(
           init: ServiceController(),
-          builder: (services) {
-            List<Service> serviceList = services.list;
-            print(serviceList.length);
+          tag: 'serviceController',
+          builder: (serviceController) {
+            List<Service> serviceList = serviceController.list;
             return ListView.builder(
               itemBuilder: (context, index) {
                 Service service = serviceList[index];

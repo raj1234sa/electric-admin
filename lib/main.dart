@@ -1,5 +1,7 @@
 import 'package:electric_admin/screens/service_action.dart';
 import 'package:electric_admin/screens/service_list.dart';
+import 'package:electric_admin/screens/signup_screen.dart';
+import 'package:electric_admin/services/auth_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,7 +11,7 @@ import 'providers/service_provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await ServiceController().initServices();
+  await Get.put(ServiceController(), tag: 'serviceController').initServices();
   runApp(MyApp());
 }
 
@@ -25,8 +27,9 @@ class MyApp extends StatelessWidget {
       routes: {
         ServicesListScreen.ROUTE_NAME: (ctx) => ServicesListScreen(),
         ServiceActionScreen.ROUTE_NAME: (ctx) => ServiceActionScreen(),
+        SignUpScreen.ROUTE_NAME: (ctx) => SignUpScreen(),
       },
-      initialRoute: ServicesListScreen.ROUTE_NAME,
+      home: AuthService.handleAuth(),
     );
   }
 }

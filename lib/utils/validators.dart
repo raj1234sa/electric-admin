@@ -11,3 +11,12 @@ dynamic validateServicePrice(String value) {
   }
   return null;
 }
+
+dynamic validatePhoneNumber(String value) {
+  Pattern pattern = r'/([^\d])\d{10}([^\d])/';
+  RegExp regex = new RegExp(pattern);
+  if (!regex.hasMatch(pattern)) {
+    return 'Please enter 10 digits only';
+  }
+  return null;
+}

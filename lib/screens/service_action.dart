@@ -1,6 +1,5 @@
 import 'package:electric_admin/models/service.dart';
 import 'package:electric_admin/providers/service_provider.dart';
-import 'package:electric_admin/screens/service_list.dart';
 import 'package:electric_admin/utils/validators.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -92,7 +91,8 @@ class _ServiceActionScreenState extends State<ServiceActionScreen> {
         _loading = true;
       });
       FocusScope.of(context).unfocus();
-      final ServiceController serviceController = Get.find(tag: 'serviceController');
+      final ServiceController serviceController =
+          Get.find(tag: 'serviceController');
       Service service = Service(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         name: _nameController.text,
@@ -100,6 +100,8 @@ class _ServiceActionScreenState extends State<ServiceActionScreen> {
       );
       try {
         serviceController.addEditService(service: service);
+        Toast.show('Service is added', context,
+            duration: Toast.LENGTH_LONG + 2);
         Get.back();
       } on Exception catch (_) {
         Get.snackbar('Error', 'Error adding service. Please try again!!');

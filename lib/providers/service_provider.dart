@@ -9,6 +9,17 @@ class ServiceController extends GetxController {
   final CollectionReference _serviceRef =
       FirebaseFirestore.instance.collection('services');
 
+  @override
+  onInit() async {
+    QuerySnapshot doc = await _serviceRef.get();
+    List<Service> list = [];
+    doc.docs.forEach((element) {
+      list.add(Service.fromJson(element.data()));
+    });
+    services = list;
+    update();
+  }
+
   List<Service> get list {
     return services;
   }
@@ -20,7 +31,6 @@ class ServiceController extends GetxController {
       list.add(Service.fromJson(element.data()));
     });
     services = list;
-    print(services);
     update();
   }
 
