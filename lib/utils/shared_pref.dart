@@ -1,10 +1,12 @@
+import 'dart:convert';
+
 import 'package:electric_admin/models/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPref {
   static Future<bool> saveUserToSharedRef(String key, User user) async {
     final prefs = await SharedPreferences.getInstance();
-    String str = user.toJson();
+    String str = json.encode(user.toMap());
     bool result = await prefs.setString(key, str);
     return result;
   }

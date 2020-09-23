@@ -10,13 +10,8 @@ String validateEmail(String email) {
 }
 
 String validatePassword(String password) {
-  String pattern =
-      r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
-  bool pwValid = RegExp(pattern).hasMatch(password);
   if (password.length < 8) {
     return 'Password must be 8 character long';
-  } else if (!pwValid) {
-    return 'Password must contain lowercase, uppercase, number & special character';
   } else {
     return null;
   }

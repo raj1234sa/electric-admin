@@ -1,5 +1,7 @@
 import 'package:electric_admin/models/user.dart';
 import 'package:electric_admin/screens/otp_screen.dart';
+import 'package:electric_admin/screens/service_list_screen.dart';
+import 'package:electric_admin/screens/signin_auth.dart';
 import 'package:electric_admin/services/auth_service.dart';
 import 'package:electric_admin/services/network_service.dart';
 import 'package:electric_admin/utils/constants.dart';
@@ -9,6 +11,7 @@ import 'package:electric_admin/widgets/primary_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:get/get.dart';
 
 class LoginScreen extends StatefulWidget {
   static const ROUTE_NAME = 'login';
@@ -45,6 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
           _passwordController.text,
         );
         if (result is bool && result) {
+          Get.offAndToNamed(ServicesListScreen.ROUTE_NAME);
         } else if (result is String) {
           showErrorDialog(
             context: context,
@@ -221,7 +225,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Center(
       child: GestureDetector(
         onTap: () {
-          Navigator.of(context).pushNamed(OTPScreen.ROUTE_NAME);
+          Navigator.of(context).pushNamed(SignInAuthScreen.ROUTE_NAME);
         },
         child: Container(
           padding: EdgeInsets.all(10.0),
