@@ -15,6 +15,22 @@ class AuthService extends GetxController {
   String verificationId;
   auth.User firebaseUser;
   bool codeSent = false;
+  User _loggedInUser;
+  auth.User _firebaseLoggedInUser;
+
+  Future<void> setLoggedInUser(User user) async {
+    _loggedInUser = user;
+    await signInWithEmailAndPassword(user.emailId, user.password);
+    update();
+  }
+
+  User get loggedInUser {
+    return _loggedInUser;
+  }
+
+  auth.User get firebaseLoggedInUser {
+    return _firebaseLoggedInUser;
+  }
 
   handleRegisterAuth() {
     return StreamBuilder(
@@ -36,44 +52,17 @@ class AuthService extends GetxController {
     await _auth.currentUser.linkWithCredential(credential);
   }
 
-  // static Future<String> signUpWithEmailAndPassword(String email,
-  //     String username, String password, String phoneNumber) async {
-  //   String errorMessage = "";
-  //   try {
-  //     auth.UserCredential userCredential = await _auth
-  //         .createUserWithEmailAndPassword(email: email, password: password);
-  //     auth.User firebaseUser = userCredential.user;
-  //     await firebaseUser.updateProfile(displayName: username);
-  //     User user = User(
-  //       emailId: firebaseUser.email,
-  //       phoneNumber: phoneNumber,
-  //       userId: firebaseUser.uid,
-  //       username: username,
-  //       isVerified: firebaseUser.emailVerified,
-  //     );
-  //     _usersRef.doc(firebaseUser.uid).set(user.toMap());
-  //     await firebaseUser.sendEmailVerification();
-  //     return kAccountSuccessMessage;
-  //   } catch (e) {
-  //     print(e.code);
-  //     switch (e.code) {
-  //       case 'email-already-in-use':
-  //         errorMessage = "Your email address is already registered";
-  //         break;
-  //     }
-  //     return errorMessage;
-  //   }
-  // }
-
-  static Future<dynamic> signInWithEmailAndPassword(
+  Future<dynamic> signInWithEmailAndPassword(
       String email, String password) async {
     String errorMessage = "";
     try {
       auth.UserCredential userCredential = await _auth
           .signInWithEmailAndPassword(email: email, password: password);
       _usersRef.doc(userCredential.user.uid).get().then((userdata) async {
+        _firebaseLoggedInUser = userCredential.user;
         User user = User.fromMap(userdata.data());
         await SharedPref.saveUserToSharedRef('loggedInUser', user);
+        update();
       });
       return true;
     } catch (e) {
@@ -104,15 +93,10 @@ class AuthService extends GetxController {
     }
   }
 
-  static Future<bool> signOut() async {
+  Future<bool> signOut() async {
     await auth.FirebaseAuth.instance.signOut();
+    _loggedInUser = null;
+    _firebaseLoggedInUser = null;
     return await SharedPref.remove('loggedInUser');
-  }
-
-  void clear() {
-    verificationId = null;
-    codeSent = false;
-    firebaseUser = null;
-    phoneNumber = null;
   }
 }

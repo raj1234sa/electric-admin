@@ -1,7 +1,9 @@
 import 'package:electric_admin/models/user.dart';
 import 'package:electric_admin/screens/service_list_screen.dart';
+import 'package:electric_admin/services/auth_service.dart';
 import 'package:electric_admin/utils/shared_pref.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import 'login_screen.dart';
 
@@ -19,6 +21,7 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
     if (user != null) {
       setState(() {
         isLoggedIn = true;
+        Get.put(AuthService(), tag: 'auth').setLoggedInUser(user);
         print('logged in user :$user');
       });
     } else {

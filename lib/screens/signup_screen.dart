@@ -35,6 +35,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _securePassword = true;
   bool _secureRePassword = true;
+  bool _loading = false;
 
   @override
   void initState() {
@@ -67,74 +68,76 @@ class _SignUpScreenState extends State<SignUpScreen> {
       child: Scaffold(
         body: SafeArea(
           child: Center(
-            child: SingleChildScrollView(
-              child: Form(
-                key: _formKey,
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        'assets/images/logo.png',
-                        width: width * 0.5,
-                        height: width * 0.5,
+            child: _loading
+                ? CircularProgressIndicator()
+                : SingleChildScrollView(
+                    child: Form(
+                      key: _formKey,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'assets/images/logo.png',
+                              width: width * 0.5,
+                              height: width * 0.5,
+                            ),
+                            SizedBox(height: 70.0),
+                            Text(
+                              'Sign Up',
+                              textAlign: TextAlign.center,
+                              style: kTitleTextStyle,
+                            ),
+                            SizedBox(
+                              height: 5.0,
+                            ),
+                            Text(
+                              'Create an account',
+                              textAlign: TextAlign.center,
+                              style: kSubTitleTextStyle,
+                            ),
+                            SizedBox(
+                              height: 30.0,
+                            ),
+                            _buildUsernameField(context),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            _buildEmailField(context),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            _buildPhoneField(context),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            _buildPasswordField(context),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            _buildRePasswordField(context),
+                            SizedBox(
+                              height: 20.0,
+                            ),
+                            buildPrimaryButton(
+                              title: 'REGISTER',
+                              onPress: () {
+                                _submit(context);
+                              },
+                            ),
+                            SizedBox(
+                              height: 70.0,
+                            ),
+                            Center(
+                              child: buildBottomText(context),
+                            ),
+                          ],
+                        ),
                       ),
-                      SizedBox(height: 70.0),
-                      Text(
-                        'Sign Up',
-                        textAlign: TextAlign.center,
-                        style: kTitleTextStyle,
-                      ),
-                      SizedBox(
-                        height: 5.0,
-                      ),
-                      Text(
-                        'Create an account',
-                        textAlign: TextAlign.center,
-                        style: kSubTitleTextStyle,
-                      ),
-                      SizedBox(
-                        height: 30.0,
-                      ),
-                      _buildUsernameField(context),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      _buildEmailField(context),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      _buildPhoneField(context),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      _buildPasswordField(context),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      _buildRePasswordField(context),
-                      SizedBox(
-                        height: 20.0,
-                      ),
-                      buildPrimaryButton(
-                        title: 'REGISTER',
-                        onPress: () {
-                          _submit(context);
-                        },
-                      ),
-                      SizedBox(
-                        height: 70.0,
-                      ),
-                      Center(
-                        child: buildBottomText(context),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-            ),
           ),
         ),
       ),
@@ -348,28 +351,40 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   void _submit(BuildContext context) async {
+    setState(() {
+      _loading = true;
+    });
     if (_formKey.currentState.validate()) {
       if (await NetworkService.checkDataConnectivity()) {
         FocusScope.of(context).unfocus();
-        await AuthService.linkWithEmailAndPassword(
-          email: _emailController.text,
-          password: _passwordController.text,
-        );
-        auth.User firebaseUser = auth.FirebaseAuth.instance.currentUser;
-        await firebaseUser.updateProfile(displayName: _userNameController.text);
-        User user = User(
-          emailId: firebaseUser.email,
-          phoneNumber: firebaseUser.phoneNumber,
-          userId: firebaseUser.uid,
-          username: _userNameController.text,
-          isVerified: firebaseUser.emailVerified,
-        );
-        final CollectionReference _usersRef =
-            FirebaseFirestore.instance.collection('users');
-        _usersRef.doc(firebaseUser.uid).set(user.toMap());
-        Toast.show("Account is created successfully", context,
-            duration: Toast.LENGTH_LONG + 4);
-        Get.toNamed(LoginScreen.ROUTE_NAME);
+        try {
+          await AuthService.linkWithEmailAndPassword(
+            email: _emailController.text,
+            password: _passwordController.text,
+          );
+          auth.User firebaseUser = auth.FirebaseAuth.instance.currentUser;
+          await firebaseUser.updateProfile(
+              displayName: _userNameController.text);
+          User user = User(
+            emailId: firebaseUser.email,
+            phoneNumber: firebaseUser.phoneNumber,
+            userId: firebaseUser.uid,
+            username: _userNameController.text,
+            password: _passwordController.text,
+          );
+          final CollectionReference _usersRef =
+              FirebaseFirestore.instance.collection('users');
+          _usersRef.doc(firebaseUser.uid).set(user.toMap());
+          Toast.show("Account is created successfully", context,
+              duration: Toast.LENGTH_LONG + 4);
+          Get.toNamed(LoginScreen.ROUTE_NAME);
+        } catch (e) {
+          await showSimpleDialogue(
+            context: context,
+            message: "${e.code} - ${e.message}",
+            showTwoActions: false,
+          );
+        }
       } else {
         await showSimpleDialogue(
           context: context,
@@ -378,5 +393,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
         );
       }
     }
+    setState(() {
+      _loading = false;
+    });
   }
 }

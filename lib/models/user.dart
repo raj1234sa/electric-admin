@@ -1,13 +1,12 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
-
 class User {
   String username;
   String emailId;
   String phoneNumber;
   String userId;
   bool isVerified;
+  String password;
 
   User({
     this.username,
@@ -15,6 +14,7 @@ class User {
     this.userId,
     this.phoneNumber,
     this.isVerified,
+    this.password,
   });
 
   User.fromMap(Map<String, dynamic> json)
@@ -22,6 +22,7 @@ class User {
         emailId = json['emailId'],
         userId = json['userId'],
         phoneNumber = json['phoneNumber'],
+        password = json['password'],
         isVerified = json['isVerified'];
 
   Map<String, dynamic> toMap() => {
@@ -30,6 +31,7 @@ class User {
         'userId': userId,
         'isVerified': isVerified,
         'phoneNumber': phoneNumber,
+        'password': password,
       };
 
   String toJson() {

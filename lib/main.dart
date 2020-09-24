@@ -13,7 +13,6 @@ import 'package:get/get.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  AuthService.signOut();
   Get.put(AuthService(), tag: 'auth');
   Get.put(ServiceController(), tag: 'service');
   runApp(MyApp());

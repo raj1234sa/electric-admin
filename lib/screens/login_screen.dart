@@ -21,48 +21,18 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  User user = User(
-    emailId: 'test@gmail.com',
-    username: 'abhishek',
-  );
-
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   FocusNode _passwordFocusNode = FocusNode();
   final _formKey = GlobalKey<FormState>();
   bool _securePassword = true;
+  bool _loading = false;
 
   @override
   void dispose() {
     _passwordController.clear();
     _passwordFocusNode.dispose();
     super.dispose();
-  }
-
-  void submit() async {
-    if (_formKey.currentState.validate()) {
-      if (await NetworkService.checkDataConnectivity()) {
-        FocusScope.of(context).unfocus();
-        var result = await AuthService.signInWithEmailAndPassword(
-          _emailController.text,
-          _passwordController.text,
-        );
-        if (result is bool && result) {
-          Get.offAndToNamed(ServicesListScreen.ROUTE_NAME);
-        } else if (result is String) {
-          showErrorDialog(
-            context: context,
-            message: result.toString(),
-          );
-        }
-      } else {
-        await showSimpleDialogue(
-          context: context,
-          message: 'Please check your internet connection...',
-          showTwoActions: false,
-        );
-      }
-    }
   }
 
   @override
@@ -74,55 +44,57 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Scaffold(
         body: SafeArea(
           child: Center(
-            child: SingleChildScrollView(
-              child: Form(
-                key: _formKey,
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const _LogoImage(),
-                      const SizedBox(height: 70.0),
-                      const Text(
-                        'Login',
-                        textAlign: TextAlign.center,
-                        style: kTitleTextStyle,
+            child: _loading
+                ? CircularProgressIndicator()
+                : SingleChildScrollView(
+                    child: Form(
+                      key: _formKey,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const _LogoImage(),
+                            const SizedBox(height: 70.0),
+                            const Text(
+                              'Login',
+                              textAlign: TextAlign.center,
+                              style: kTitleTextStyle,
+                            ),
+                            const SizedBox(
+                              height: 5.0,
+                            ),
+                            const Text(
+                              'Please enter your credentials',
+                              textAlign: TextAlign.center,
+                              style: kSubTitleTextStyle,
+                            ),
+                            const SizedBox(
+                              height: 30.0,
+                            ),
+                            buildNameTextField(),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            buildPasswordTextField(),
+                            buildForgetPwText(),
+                            const SizedBox(
+                              height: 20.0,
+                            ),
+                            buildPrimaryButton(
+                              title: 'LOGIN',
+                              onPress: () => submit(),
+                            ),
+                            const SizedBox(
+                              height: 70.0,
+                            ),
+                            buildLowerText(),
+                          ],
+                        ),
                       ),
-                      const SizedBox(
-                        height: 5.0,
-                      ),
-                      const Text(
-                        'Please enter your credentials',
-                        textAlign: TextAlign.center,
-                        style: kSubTitleTextStyle,
-                      ),
-                      const SizedBox(
-                        height: 30.0,
-                      ),
-                      buildNameTextField(),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      buildPasswordTextField(),
-                      buildForgetPwText(),
-                      const SizedBox(
-                        height: 20.0,
-                      ),
-                      buildPrimaryButton(
-                        title: 'LOGIN',
-                        onPress: () => submit(),
-                      ),
-                      const SizedBox(
-                        height: 70.0,
-                      ),
-                      buildLowerText(),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-            ),
           ),
         ),
       ),
@@ -254,6 +226,38 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  void submit() async {
+    setState(() {
+      _loading = true;
+    });
+    if (_formKey.currentState.validate()) {
+      if (await NetworkService.checkDataConnectivity()) {
+        FocusScope.of(context).unfocus();
+        var result = await AuthService().signInWithEmailAndPassword(
+          _emailController.text,
+          _passwordController.text,
+        );
+        if (result is bool && result) {
+          Get.offAndToNamed(ServicesListScreen.ROUTE_NAME);
+        } else if (result is String) {
+          showErrorDialog(
+            context: context,
+            message: result.toString(),
+          );
+        }
+      } else {
+        await showSimpleDialogue(
+          context: context,
+          message: 'Please check your internet connection...',
+          showTwoActions: false,
+        );
+      }
+    }
+    setState(() {
+      _loading = false;
+    });
   }
 }
 

@@ -6,7 +6,7 @@ Widget buildLogoutButton(BuildContext context) {
   return IconButton(
     icon: Icon(Icons.exit_to_app),
     onPressed: () async {
-      await AuthService.signOut();
+      await AuthService().signOut();
       Navigator.pushReplacementNamed(context, LoginScreen.ROUTE_NAME);
     },
   );
